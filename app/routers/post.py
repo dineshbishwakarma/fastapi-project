@@ -4,6 +4,7 @@ from ..database import  get_db
 from sqlalchemy.orm import Session
 from typing import List,Optional
 from .. import oauth2
+from sqlalchemy import func
 
 
 
@@ -13,7 +14,7 @@ router = APIRouter(
 )
 # Get post
      
-@router.get("/", response_model=List[schemas.Post])
+@router.get("/", response_model=List[schemas.PostOut])
 def get_posts(db:Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user), 
                # Here limit is the query parameter, if limit = 5, will show only 5 posts by default
                # here skip skips the given value number of posts
@@ -27,8 +28,9 @@ def get_posts(db:Session = Depends(get_db), current_user: int = Depends(oauth2.g
      # This will query the database and return the columns from table 
      # here we will use offset to skip some posts 
      # here we will use filter contains method
-     posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
-     
+     # posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
+     posts = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(
+        models.Vote, models.Vote.post_id == models.Post.id, isouter=True).group_by(models.Post.id).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
      # return in jason format
      return posts
 
@@ -73,14 +75,17 @@ def create_posts(post: schemas.PostCreate , db: Session = Depends(get_db), curre
 # Read a single Post 
 # here {id}: path parameter 
 
-@router.get("/{id}", response_model=schemas.Post)
+@router.get("/{id}", response_model=schemas.PostOut)
 
 # here id can be assigned data type by id : int or str
 def get_post(id: int, db: Session = Depends(get_db), current_user: int =
                  Depends(oauth2.get_current_user)):
         
      # here we need filter to get specific id and one post
-     post = db.query(models.Post).filter(models.Post.id == id).first() 
+     #post = db.query(models.Post).filter(models.Post.id == id).first()
+
+     post = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(
+        models.Vote, models.Vote.post_id == models.Post.id, isouter=True).group_by(models.Post.id).filter(models.Post.id == id).first() 
 
      if not post:
           raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,

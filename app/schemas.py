@@ -37,6 +37,13 @@ class Post(PostBase):
     class Config:
         from_attributes = True
 
+class PostOut(BaseModel):
+    Post: Post
+    votes: int
+
+    class Config:
+        from_attributes = True
+
 # Create User schemas
 class UserCreate(BaseModel):
     email : EmailStr
@@ -58,4 +65,3 @@ class TokenData(BaseModel):
 class Vote(BaseModel):
     post_id: int
     dir: conint(strict=True, ge=0, le=1)
-    
