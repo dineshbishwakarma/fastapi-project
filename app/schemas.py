@@ -2,6 +2,8 @@ from pydantic import BaseModel
 from datetime import datetime
 from pydantic import EmailStr
 from typing import Optional
+from pydantic.types import conint
+
 # Schema to create a post 
 # This ensures that user post is in the below data typess
 # This means the request is made in the following format
@@ -31,7 +33,7 @@ class Post(PostBase):
     created_at: datetime
     owner_id : int
     owner: UserOut
-    
+
     class Config:
         from_attributes = True
 
@@ -52,3 +54,8 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     id: Optional[str] = None
+
+class Vote(BaseModel):
+    post_id: int
+    dir: conint(strict=True, ge=0, le=1)
+    
