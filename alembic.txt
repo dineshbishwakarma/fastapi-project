@@ -1,0 +1,39 @@
+# Install alembic
+% pip install alembic
+
+% See help
+alembic --help
+
+# Initialize alembic directory
+% alembic init alembic <-- directory
+
+# See revision help
+% alembic revision --help
+
+# Create posts table revision
+% alembic revision -m "create posts table"
+
+# Create posts table
+% alembic upgrade revision-number
+    Ex: alembic upgrade 523ce49caca0
+
+# To add a new column to posts table we need new revision so 
+% alembic revision -m "add content column to posts table"
+
+# Check in which revision of database you are pointing
+% alembic current
+
+# Check the latest revision created but not yet applied
+% alembic heads
+
+# Upgrade revision in head to current base 
+% alembic upgrade head <-- (not heads)
+
+# Downgrade(rollback) to revision
+% alembic downgrade revision_number
+
+# For 1 revision earlier 
+% alembic downgrade -1
+
+# History of revision
+% alembic history
