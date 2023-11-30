@@ -37,3 +37,6 @@ alembic --help
 
 # History of revision
 % alembic history
+
+# Autogenerate table from already defined model
+% alembic revision --autogenerate -m "message you want to write"
